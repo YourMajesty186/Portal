@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard Captive Portal</title>
+<style>
+  body { font-family: Arial, sans-serif; background:#f2f4f7; margin:0; padding:24px; }
+  h2 { color:#222; }
+  .stats { display:flex; gap:16px; margin-bottom:20px; }
+  .stat-box { background:#fff; padding:16px 24px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.08); text-align:center; }
+  .stat-box .num { font-size:28px; font-weight:bold; color:#2563eb; }
+  table { width:100%; border-collapse:collapse; background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
+  th, td { padding:10px 14px; text-align:left; border-bottom:1px solid #eee; font-size:14px; }
+  th { background:#f8fafc; }
+</style>
+</head>
+<body>
+  <h2>Captive Portal Dashboard</h2>
+  <div class="stats">
+    <div class="stat-box"><div class="num" id="total">-</div>Total Users</div>
+    <div class="stat-box"><div class="num" id="today">-</div>Login Hari Ini</div>
+  </div>
+  <table>
+    <thead><tr><th>NIK</th><th>Nama</th><th>IP</th><th>Waktu</th></tr></thead>
+    <tbody id="tbody"></tbody>
+  </table>
+
+<script>
+async function load() {
+  const stats = await (await fetch('/api/stats')).json();
+  document.getElementById('total').textContent = stats.total_users;
+  document.getElementById('today').textContent = stats.today_logins;
+
+  const users = await (await fetch('/api/users')).json();
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = users.map(u => `
+    <tr>
+      <td>${u.nik}</td>
+      <td>${u.nama || '-'}</td>
+      <td>${u.ip_address || '-'}</td>
+      <td>${new Date(u.created_at).toLocaleString('id-ID')}</td>
+    </tr>`).join('');
+}
+load();
+setInterval(load, 5000);
+</script>
+</body>
+</html>

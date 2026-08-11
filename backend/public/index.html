@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Captive Portal</title>
+<style>
+  body { font-family: Arial, sans-serif; background:#f2f4f7; display:flex; align-items:center; justify-content:center; height:100vh; margin:0; }
+  .card { background:#fff; padding:32px; border-radius:12px; box-shadow:0 4px 16px rgba(0,0,0,0.1); width:320px; text-align:center; }
+  h2 { margin-bottom:20px; color:#222; }
+  input { width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:6px; box-sizing:border-box; }
+  button { width:100%; padding:10px; margin-top:12px; background:#2563eb; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:15px; }
+  button:hover { background:#1d4ed8; }
+  #msg { margin-top:14px; font-size:14px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h2>Selamat Datang</h2>
+    <input id="nik" placeholder="NIK" maxlength="20">
+    <input id="nama" placeholder="Nama (opsional)">
+    <button onclick="login()">Masuk</button>
+    <div id="msg"></div>
+  </div>
+
+<script>
+async function login() {
+  const nik = document.getElementById('nik').value.trim();
+  const nama = document.getElementById('nama').value.trim();
+  const msg = document.getElementById('msg');
+  if (!nik) { msg.textContent = 'NIK wajib diisi'; msg.style.color = 'red'; return; }
+  try {
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nik, nama })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      msg.textContent = data.message;
+      msg.style.color = 'green';
+    } else {
+      msg.textContent = data.error;
+      msg.style.color = 'red';
+    }
+  } catch (e) {
+    msg.textContent = 'Gagal terhubung ke server';
+    msg.style.color = 'red';
+  }
+}
+</script>
+</body>
+</html>
